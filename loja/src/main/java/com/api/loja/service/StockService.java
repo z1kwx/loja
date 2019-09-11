@@ -3,6 +3,7 @@ package com.api.loja.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -10,6 +11,7 @@ import com.api.loja.exceptions.AlreadyExistsExcpetion;
 import com.api.loja.exceptions.InvalidStockQuantity;
 import com.api.loja.exceptions.NotFoundException;
 import com.api.loja.models.Stock;
+import com.api.loja.models.DTO.StockQuantityDTO;
 import com.api.loja.repository.StockRepository;
 
 @Service
@@ -66,10 +68,20 @@ public class StockService {
 //	public void updateStock(Long id, Stock newStock) {
 //		Stock oldStock = getOneStockById(id);
 //		validaStock(newStock);
+//		thisProductExistisInThisAgencia(newStock.getProductId(), newStock.getAgenciaId());
 //		BeanUtils.copyProperties(newStock, oldStock, "id");
 //		stockRepository.save(oldStock);
 //	}
-//	
+	
+	public void updateQuantityInStock(Long id, StockQuantityDTO newQuantity) {
+		Stock stock =  getOneStockById(id);
+		
+		if(newQuantity.getQuantity() < 0) {
+			throw new InvalidStockQuantity("Quantidade para estoque informada é invalida");
+		}
+		stock.setQuantityInStock(newQuantity.getQuantity());
+		stockRepository.save(stock);
+	}
 	
 	public void deleteStock(Long id) {
 		if(!stockRepository.existsById(id)) {
@@ -125,5 +137,7 @@ public class StockService {
 		}
 		
 	}
+
+
 
 }
