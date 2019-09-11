@@ -37,23 +37,24 @@ public class AgenciaService {
 	}
 
 	public Agencia getOneById(Long id) {
-		log.debug("getOneById(Long id) - start - params: id {}", id);
+		log.info("getOneById(Long id) - start - params: id {}", id);
 		Agencia agencia = agenciaRepository.findById(id).orElseThrow(
 				() -> new NotFoundException("Agencia nao encontrada!"));
 		return agencia;
 	}
 
 	public void createNewAgencia(AgencyDTO newAgenciaDTO) {
+		log.info("createNewAgencia(AgencyDTO newAgenciaDTO) - start - params: {}", newAgenciaDTO);
 		validaAgenciaDTO(newAgenciaDTO);
 		
 		Agencia newAgencia = CreateAgencia(newAgenciaDTO);
-		
+		log.warn("agenciaRepository - start - method: save");
 		agenciaRepository.save(newAgencia);
 	}
 	
 
 	public void updateAgency(Long id, AgencyDTO newAgenciaDTO) {
-		log.debug("updateAgency(Long id, AgencyDTO newAgenciaDTO) - start - params: id: {}, newAgenciaDTO: {}", id, newAgenciaDTO);
+		log.info("updateAgency(Long id, AgencyDTO newAgenciaDTO) - start - params: id: {}, newAgenciaDTO: {}", id, newAgenciaDTO);
 		validaAgenciaDTO(newAgenciaDTO);
 		
 		Agencia oldAgencia = new Agencia();
@@ -63,42 +64,47 @@ public class AgenciaService {
 		
 		log.warn("Copying Properties - start");
 		BeanUtils.copyProperties(newAgencia, oldAgencia, "agenciaId");
-		log.warn("agenciaRepository - start - method: save()");
+		log.warn("agenciaRepository - start - method: save");
 		agenciaRepository.save(oldAgencia);
 	}
 
 
 	public void deleteAgency(Long id)  {
+		log.info("deleteAgency(Long id) - start - params: {}", id);
 		if(!existsAgencyById(id)) {
+			log.warn("deleteAgency - notFound - reason: Agencia não encontrada!");
 			throw new NotFoundException("Agencia não encontrada!");
 		}
 		if(stockService.hasAgencyStock(id)) {
+			log.warn("deleteAgency - Unathorized - reason: Agencia possui Estoque ativo!");
 			throw new UnathorizedDeleteException("Agencia possui Estoque ativo!");
 		}
+		log.warn("agenciaRepository - start - method: deleteById)");
 		agenciaRepository.deleteById(id);
 	}
 
 	public Boolean existsAgencyById(Long id) {
+		log.info("existsAgencyById(Long id) - start - params: {}", id);
 		return agenciaRepository.existsById(id);
 	}
 
 	public void validaAgenciaDTO(AgencyDTO newAgenciaDTO) {
-		log.warn("validaAgenciaDTO(AgencyDTO newAgenciaDTO) - start - params: newAgenciaDTO: {}", newAgenciaDTO);
+		log.info("validaAgenciaDTO(AgencyDTO newAgenciaDTO) - start - params: newAgenciaDTO: {}", newAgenciaDTO);
 		
 		if(newAgenciaDTO.getCep().isEmpty() || newAgenciaDTO.getCep().equalsIgnoreCase("") || newAgenciaDTO.getCep().length() != 8) {
-			log.error("validaAgenciaDTO - error: Cep");
+			log.warn("validaAgenciaDTO - InvalidAgency - reason: Invalid Cep");
 			throw new InvalidAgencyException("Invalid Cep");
 		}
 		
 		if (newAgenciaDTO.getName().isEmpty() || newAgenciaDTO.getName().equalsIgnoreCase("")) {
-			log.error("validaAgenciaDTO - error: Name");
+			log.warn("validaAgenciaDTO - InvalidAgency - reason: Invalid name");
 			throw new InvalidAgencyException("Invalid name");
 		}
 		
 	}
 
 	private Agencia CreateAgencia(AgencyDTO newAgenciaDTO) {
-		log.debug("CreateAgencia(AgencyDTO newAgenciaDTO) - start - params: newAgenciaDTO: {}", newAgenciaDTO);
+		log.info("CreateAgencia(AgencyDTO newAgenciaDTO) - start - params: newAgenciaDTO: {}", newAgenciaDTO);
 		
 		CepDTO cepResponse = new CepDTO();
 		log.warn("CepFeingCleint - start - method: getValidaCep(String cep) - params: cep: {}", newAgenciaDTO.getCep());

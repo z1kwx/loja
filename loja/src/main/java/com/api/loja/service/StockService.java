@@ -3,6 +3,8 @@ package com.api.loja.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +16,8 @@ import com.api.loja.repository.StockRepository;
 
 @Service
 public class StockService {
+	
+	private static final Logger log = LoggerFactory.getILoggerFactory().getLogger(StockService.class.getName());
 
 	@Autowired
 	private StockRepository stockRepository;
@@ -25,11 +29,13 @@ public class StockService {
 	private ProductsService productService;
 	
 	public List<Stock> getAllStock() {
+		log.info("getAllStock - start");
 		return stockRepository.findAll();
 	}
 
 
 	public Stock getOneStockById(Long id) {
+		log.info("getOneStockById(Long id) - start - params: id:{}", id);
 		Stock stock = stockRepository.findById(id).orElseThrow(
 				() -> new NotFoundException("Stock não encontrado!"));
 		return stock;
@@ -37,6 +43,7 @@ public class StockService {
 
 
 	public List<Stock> getAllStocksByAgenciaId(Long agenciaId) {
+		log.info("getAllStocksByAgenciaId(Long agenciaId) - start - params: agenciaId:{}", agenciaId);
 		List<Stock> allAgenStocks = new ArrayList<>();
 		allAgenStocks = stockRepository.findByAgenciaId(agenciaId);
 		return allAgenStocks;
@@ -44,6 +51,7 @@ public class StockService {
 
 
 	public List<Stock> getAllStocksByProductId(Long productId) {
+		log.info("getAllStocksByProductId(Long productId) - start - params: productId: {}", productId);
 		List<Stock> allProductStocks = new ArrayList<>();
 		allProductStocks = stockRepository.findByProductId(productId);
 		return allProductStocks;
@@ -51,6 +59,7 @@ public class StockService {
 
 
 	public Stock getStockByAgenIdAndProcudctId(Long agenciaId, Long productId) {
+		//to aqui fazendo log
 		Stock stock = new Stock();
 		stock = stockRepository.findByAgenciaIdAndProductId(agenciaId, productId);
 		return stock;
