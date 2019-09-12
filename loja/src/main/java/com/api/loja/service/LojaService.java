@@ -26,15 +26,21 @@ public class LojaService {
 
 	public List<LojaProducts> listAllProducts() {
 		List<LojaProducts> allLojaProducts = new ArrayList<>();
-		List<LojaAgency> allLojaAgencys = new ArrayList<>();
+		allLojaProducts = createLojaProduct();
+		return allLojaProducts;
+	}
+
+	
+	public List<LojaProducts> createLojaProduct(){
+		List<LojaProducts> allLojaProducts = new ArrayList<>();
 		List<Products> allProducts = new ArrayList<>();
-		
-		LojaProducts newLojaProduct = new LojaProducts();
-		LojaAgency newLojaAgency = new LojaAgency();
 		
 		allProducts = productsService.getAllProducts();
 		
 		for (Products obj : allProducts) {
+			LojaProducts newLojaProduct = new LojaProducts();
+			List<LojaAgency> allLojaAgencys = new ArrayList<>();
+			
 			newLojaProduct.setId(obj.getProductId());
 			newLojaProduct.setProductName(obj.getProductName());
 			newLojaProduct.setProductType(obj.getProductType());
@@ -49,10 +55,12 @@ public class LojaService {
 				}
 			}
 			
-			Agencia agen = new Agencia();
 			
 			for (Long agenIds : allAgencysId) {
+				Agencia agen = new Agencia();
 				agen = agenciaService.getOneById(agenIds);
+				
+				LojaAgency newLojaAgency = new LojaAgency();
 				newLojaAgency.setCep(agen.getCep());
 				newLojaAgency.setId(agen.getAgenciaId());
 				newLojaAgency.setLocalidade(agen.getLocalidade());
@@ -73,11 +81,7 @@ public class LojaService {
 			allLojaProducts.add(newLojaProduct);
 		}
 		
-		
 		return allLojaProducts;
 	}
-
-	
-	
 	
 }
