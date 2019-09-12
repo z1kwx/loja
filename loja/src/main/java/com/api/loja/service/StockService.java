@@ -59,7 +59,7 @@ public class StockService {
 
 
 	public Stock getStockByAgenIdAndProcudctId(Long agenciaId, Long productId) {
-		//to aqui fazendo log
+		log.info("getStockByAgenIdAndProcudctId(Long agenciaId, Long productId) - start - params: agenciaId: {}, productId: {}", agenciaId, productId);
 		Stock stock = new Stock();
 		stock = stockRepository.findByAgenciaIdAndProductId(agenciaId, productId);
 		return stock;
@@ -67,6 +67,7 @@ public class StockService {
 
 
 	public void createStock(Stock stock) {
+		log.info("createStock(Stock stock) - start - params: stocks: {}", stock);
 		validaStock(stock);
 		thisProductExistisInThisAgencia(stock.getProductId(), stock.getAgenciaId());
 		stockRepository.save(stock);
@@ -81,9 +82,11 @@ public class StockService {
 //	}
 	
 	public void updateQuantityInStock(Long id, Long newQuantity) {
+		log.info("updateQuantityInStock(Long id, Long newQuantity) - start - params: id: {}, newQuantity: {}", id, newQuantity);
 		Stock stock =  getOneStockById(id);
 		
 		if(newQuantity < 0) {
+			log.warn("updateQuantityInStock - InvalidStock - reason: Quantidade para estoque informada é invalida");
 			throw new InvalidStockQuantity("Quantidade para estoque informada é invalida");
 		}
 		stock.setQuantityInStock(newQuantity);
@@ -91,26 +94,35 @@ public class StockService {
 	}
 	
 	public void deleteStock(Long id) {
+		log.info("deleteStock(Long id) - start - params: id: {}", id);
 		if(!stockRepository.existsById(id)) {
+			log.warn("deleteStock - NotFound - reason: Estoque nao encontrado!");
 			throw new NotFoundException("Estoque nao encontrado!");
 		}
+		log.warn("stockRepository - start - method: deletebyId");
 		stockRepository.deleteById(id);
 	}
 	
 
 	public void validaStock(Stock stock) {
+		log.info("validaStock(Stock stock) - start - params: stock: {}", stock);
+		
 		if(!productService.existsProductById(stock.getProductId())) {
+			log.warn("validaStock - NotFound - reason: Produto não encontrado!");
 			throw new NotFoundException("Produto não encontrado!");
 		}
 		if(!agenciaService.existsAgencyById(stock.getAgenciaId())) {
+			log.warn("validaStock - NotFound - reason: Agencia não encontrada!");
 			throw new NotFoundException("Agencia não encontrada!");
 		}
 		if(stock.getQuantityInStock() < 0) {
+			log.warn("validaStock - InvalidStock - reason: Quantidade em Stock invalida!");
 			throw new InvalidStockQuantity("Quantidade em Stock invalida!");
 		}
 	}
 	
 	public void thisProductExistisInThisAgencia(Long productId, Long agenciaId) {
+		log.info("thisProductExistisInThisAgencia(Long productId, Long agenciaId) - start - params: productId: {}, agenciaId: {}", productId, agenciaId);
 		Boolean exists = false;
 		List<Stock> allAgenStocks = getAllStocksByAgenciaId(agenciaId);
 		for (Stock obj : allAgenStocks) {
@@ -119,12 +131,14 @@ public class StockService {
 			}
 		}
 		if(exists) {
+			log.warn("thisProductExistisInThisAgencia - AlreadyExists - reson: This product already exists in this agency!");
 			throw new AlreadyExistsExcpetion("This product already exists in this agency!");
 		}
 	}
 
 
 	public Boolean hasAgencyStock(Long agenciaId) {
+		log.info("hasAgencyStock(Long agenciaId) - start - params: agenciaId: {}", agenciaId);
 		List<Stock> agenciaStock = getAllStocksByAgenciaId(agenciaId);
 		if(agenciaStock.size() > 0) {
 			return true;
@@ -136,6 +150,7 @@ public class StockService {
 
 
 	public Boolean hasProductStock(Long productId) {
+		log.info("hasProductStock(Long productId) - start - params: productId: {}", productId);
 		List<Stock> productStocks = getAllStocksByProductId(productId);
 		if(productStocks.size() > 0) {
 			return true;
